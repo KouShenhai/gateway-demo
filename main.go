@@ -41,13 +41,13 @@ type UpReportPropertiesDeviceMessage struct {
 
 func main() {
 	f := fory.New(fory.WithXlang(true))
-	if err := f.RegisterStruct(GatewayMessage{}, 244); err != nil {
+	if err := f.RegisterStruct(GatewayMessage{}, 1); err != nil {
 		fmt.Println(err)
 	}
-	if err := f.RegisterStruct(DeviceMessage{}, 245); err != nil {
+	if err := f.RegisterStruct(DeviceMessage{}, 2); err != nil {
 		fmt.Println(err)
 	}
-	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 246); err != nil {
+	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 3); err != nil {
 		fmt.Println(err)
 	}
 	options := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:41883").SetClientID("test-001").SetUsername("root").SetPassword("laokou123").SetConnectTimeout(5 * time.Second)
