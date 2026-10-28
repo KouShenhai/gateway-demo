@@ -6,6 +6,7 @@ import (
 	"github.com/apache/fory/go/fory"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -52,6 +53,7 @@ type UpReportPropertiesGatewayMessage struct {
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
 	f := fory.New(fory.WithXlang(true))
 	if err := f.RegisterStruct(GatewayMessage{}, 1); err != nil {
 		fmt.Println(err)
