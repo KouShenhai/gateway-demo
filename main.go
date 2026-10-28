@@ -69,6 +69,7 @@ func main() {
 	}
 	defer client.Disconnect(250)
 	sendDeviceMessage(f, client)
+	time.Sleep(1 * time.Second)
 	sendGatewayMessage(f, client)
 }
 
