@@ -130,11 +130,11 @@ func main() {
 			"currentPositionZ":         450,
 		},
 	}
-	bytes, err := f.Serialize(&msg)
+	b1, err := f.Serialize(&msg)
 	if err != nil {
 		fmt.Println(err)
 	}
-	client.Publish(topic, 0, false, bytes)
+	client.Publish(topic, 0, false, b1)
 	// 网关属性
 	topic = "up/laokouyun/KEG100/properties/report"
 	message := UpReportPropertiesGatewayMessage{
@@ -158,9 +158,9 @@ func main() {
 			"interval":  30,
 		},
 	}
-	bytes, err = f.Serialize(&message)
+	b2, err := f.Serialize(&message)
 	if err != nil {
 		fmt.Println(err)
 	}
-	client.Publish(topic, 0, false, bytes)
+	client.Publish(topic, 0, false, b2)
 }
