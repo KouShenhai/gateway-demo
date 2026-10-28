@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/apache/fory/go/fory"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"os"
-	"strings"
 	"time"
 )
 
@@ -51,9 +48,6 @@ type UpReportPropertiesGatewayMessage struct {
 }
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(input)
 	f := fory.New(fory.WithXlang(true))
 	if err := f.RegisterStruct(GatewayMessage{}, 1); err != nil {
 		fmt.Println(err)
@@ -74,102 +68,111 @@ func main() {
 		fmt.Println(token.Error())
 	}
 	defer client.Disconnect(250)
-	if input == "1" {
-		// 设备属性
-		topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
-		msg := UpReportPropertiesDeviceMessage{
-			DeviceMessage: DeviceMessage{
-				GatewayMessage: GatewayMessage{
-					TenantCode: "laokouyun",
-					GatewaySn:  "KEG100",
-					Timestamp:  time.Now().UnixMilli(),
-					RequestId:  100,
-					Metadata:   map[string]interface{}{},
-				},
-				DeviceSn:   "CNC100",
-				DeviceName: "数控机床",
-			},
-			Properties: map[string]interface{}{
-				"programNumber":            "CNC100",
-				"programName":              "SHAFT_ROUGHING_V2.NC",
-				"readTime":                 "2026-10-28 14:06:47",
-				"spindleRatio":             85,
-				"spindleLoad":              623,
-				"spindleName":              "SPINDLE-100",
-				"spindleSpeed":             4380,
-				"spindleActualSpeed":       5010,
-				"workTime":                 18640,
-				"bootTime":                 "2026-10-28 07:30:12",
-				"cuttingTime":              9420,
-				"feedRate":                 78,
-				"feedRatio":                100,
-				"singleWorkPieces":         4,
-				"workPieces":               1357,
-				"workMode":                 "AUTO",
-				"runningState":             "running",
-				"emergencyStopState":       true,
-				"alarmState":               true,
-				"programRegisteredNumber":  128,
-				"programRegistrableNumber": 372,
-				"memoryUsed":               524288,
-				"memoryAvailable":          786432,
-				"spindleSetSpeed":          4500,
-				"spindleTemperature":       46,
-				"machinePositionY":         1520,
-				"spindleCurrent":           1850,
-				"feedSetRate":              800,
-				"workpieceNumber":          1357,
-				"toolNumber":               7,
-				"blockNumber":              1204,
-				"servoLoadX":               32,
-				"servoLoadY":               28,
-				"servoLoadZ":               41,
-				"surplusPositionX":         15,
-				"surplusPositionY":         8,
-				"surplusPositionZ":         3,
-				"workpiecePositionX":       2350,
-				"workpiecePositionY":       1200,
-				"workpiecePositionZ":       450,
-				"machinePositionX":         2500,
-				"machinePositionZ":         480,
-				"currentPositionX":         2350,
-				"currentPositionY":         1200,
-				"currentPositionZ":         450,
-			},
-		}
-		b1, err := f.Serialize(&msg)
-		if err != nil {
-			fmt.Println(err)
-		}
-		client.Publish(topic1, 0, false, b1)
-	} else if input == "2" {
-		// 网关属性
-		topic2 := "up/laokouyun/KEG100/properties/report"
-		message := UpReportPropertiesGatewayMessage{
+	go func() {
+		sendDeviceMessage(f, client)
+	}()
+	go func() {
+		sendGatewayMessage(f, client)
+	}()
+}
+
+func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
+	// 设备属性
+	topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
+	msg := UpReportPropertiesDeviceMessage{
+		DeviceMessage: DeviceMessage{
 			GatewayMessage: GatewayMessage{
 				TenantCode: "laokouyun",
 				GatewaySn:  "KEG100",
 				Timestamp:  time.Now().UnixMilli(),
-				RequestId:  101,
+				RequestId:  100,
 				Metadata:   map[string]interface{}{},
 			},
-			Properties: map[string]interface{}{
-				"diskTotal": "128GB",
-				"diskUsed":  "76.8GB",
-				"diskUsage": "60%",
-				"cpuUsage":  "35.6%",
-				"memTotal":  "16GB",
-				"memUsed":   "9.2GB",
-				"memUsage":  "57.5%",
-				"uptime":    "15天8小时32分钟",
-				"version":   "v1.0.0",
-				"interval":  30,
-			},
-		}
-		b2, err := f.Serialize(&message)
-		if err != nil {
-			fmt.Println(err)
-		}
-		client.Publish(topic2, 0, false, b2)
+			DeviceSn:   "CNC100",
+			DeviceName: "数控机床",
+		},
+		Properties: map[string]interface{}{
+			"programNumber":            "CNC100",
+			"programName":              "SHAFT_ROUGHING_V2.NC",
+			"readTime":                 "2026-10-28 14:06:47",
+			"spindleRatio":             85,
+			"spindleLoad":              623,
+			"spindleName":              "SPINDLE-100",
+			"spindleSpeed":             4380,
+			"spindleActualSpeed":       5010,
+			"workTime":                 18640,
+			"bootTime":                 "2026-10-28 07:30:12",
+			"cuttingTime":              9420,
+			"feedRate":                 78,
+			"feedRatio":                100,
+			"singleWorkPieces":         4,
+			"workPieces":               1357,
+			"workMode":                 "AUTO",
+			"runningState":             "running",
+			"emergencyStopState":       true,
+			"alarmState":               true,
+			"programRegisteredNumber":  128,
+			"programRegistrableNumber": 372,
+			"memoryUsed":               524288,
+			"memoryAvailable":          786432,
+			"spindleSetSpeed":          4500,
+			"spindleTemperature":       46,
+			"machinePositionY":         1520,
+			"spindleCurrent":           1850,
+			"feedSetRate":              800,
+			"workpieceNumber":          1357,
+			"toolNumber":               7,
+			"blockNumber":              1204,
+			"servoLoadX":               32,
+			"servoLoadY":               28,
+			"servoLoadZ":               41,
+			"surplusPositionX":         15,
+			"surplusPositionY":         8,
+			"surplusPositionZ":         3,
+			"workpiecePositionX":       2350,
+			"workpiecePositionY":       1200,
+			"workpiecePositionZ":       450,
+			"machinePositionX":         2500,
+			"machinePositionZ":         480,
+			"currentPositionX":         2350,
+			"currentPositionY":         1200,
+			"currentPositionZ":         450,
+		},
 	}
+	b1, err := f.Serialize(&msg)
+	if err != nil {
+		fmt.Println(err)
+	}
+	client.Publish(topic1, 0, false, b1)
+}
+
+func sendGatewayMessage(f *fory.Fory, client mqtt.Client) {
+	// 网关属性
+	topic2 := "up/laokouyun/KEG100/properties/report"
+	message := UpReportPropertiesGatewayMessage{
+		GatewayMessage: GatewayMessage{
+			TenantCode: "laokouyun",
+			GatewaySn:  "KEG100",
+			Timestamp:  time.Now().UnixMilli(),
+			RequestId:  101,
+			Metadata:   map[string]interface{}{},
+		},
+		Properties: map[string]interface{}{
+			"diskTotal": "128GB",
+			"diskUsed":  "76.8GB",
+			"diskUsage": "60%",
+			"cpuUsage":  "35.6%",
+			"memTotal":  "16GB",
+			"memUsed":   "9.2GB",
+			"memUsage":  "57.5%",
+			"uptime":    "15天8小时32分钟",
+			"version":   "v1.0.0",
+			"interval":  30,
+		},
+	}
+	b2, err := f.Serialize(&message)
+	if err != nil {
+		fmt.Println(err)
+	}
+	client.Publish(topic2, 0, false, b2)
 }
