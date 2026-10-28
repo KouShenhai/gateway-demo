@@ -68,12 +68,8 @@ func main() {
 		fmt.Println(token.Error())
 	}
 	defer client.Disconnect(250)
-	go func() {
-		sendDeviceMessage(f, client)
-	}()
-	go func() {
-		sendGatewayMessage(f, client)
-	}()
+	sendDeviceMessage(f, client)
+	sendGatewayMessage(f, client)
 }
 
 func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
