@@ -69,7 +69,7 @@ func main() {
 	}
 	defer client.Disconnect(250)
 	// 设备属性
-	topic := "up/laokouyun/KEG100/CNC100/properties/report"
+	topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
 	msg := UpReportPropertiesDeviceMessage{
 		DeviceMessage: DeviceMessage{
 			GatewayMessage: GatewayMessage{
@@ -134,9 +134,9 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	client.Publish(topic, 0, false, b1)
+	client.Publish(topic1, 0, false, b1)
 	// 网关属性
-	topic = "up/laokouyun/KEG100/properties/report"
+	topic2 := "up/laokouyun/KEG100/properties/report"
 	message := UpReportPropertiesGatewayMessage{
 		GatewayMessage: GatewayMessage{
 			TenantCode: "laokouyun",
@@ -162,5 +162,5 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	client.Publish(topic, 0, false, b2)
+	client.Publish(topic2, 0, false, b2)
 }
