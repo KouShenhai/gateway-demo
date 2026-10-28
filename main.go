@@ -136,31 +136,31 @@ func main() {
 	}
 	client.Publish(topic1, 0, false, b1)
 	// 网关属性
-	topic2 := "up/laokouyun/KEG100/properties/report"
-	message := UpReportPropertiesGatewayMessage{
-		GatewayMessage: GatewayMessage{
-			TenantCode: "laokouyun",
-			GatewaySn:  "KEG100",
-			Timestamp:  time.Now().UnixMilli(),
-			RequestId:  101,
-			Metadata:   map[string]interface{}{},
-		},
-		Properties: map[string]interface{}{
-			"diskTotal": "128GB",
-			"diskUsed":  "76.8GB",
-			"diskUsage": "60%",
-			"cpuUsage":  "35.6%",
-			"memTotal":  "16GB",
-			"memUsed":   "9.2GB",
-			"memUsage":  "57.5%",
-			"uptime":    "15天8小时32分钟",
-			"version":   "v1.0.0",
-			"interval":  30,
-		},
-	}
-	b2, err := f.Serialize(&message)
-	if err != nil {
-		fmt.Println(err)
-	}
-	client.Publish(topic2, 0, false, b2)
+	//topic2 := "up/laokouyun/KEG100/properties/report"
+	//message := UpReportPropertiesGatewayMessage{
+	//	GatewayMessage: GatewayMessage{
+	//		TenantCode: "laokouyun",
+	//		GatewaySn:  "KEG100",
+	//		Timestamp:  time.Now().UnixMilli(),
+	//		RequestId:  101,
+	//		Metadata:   map[string]interface{}{},
+	//	},
+	//	Properties: map[string]interface{}{
+	//		"diskTotal": "128GB",
+	//		"diskUsed":  "76.8GB",
+	//		"diskUsage": "60%",
+	//		"cpuUsage":  "35.6%",
+	//		"memTotal":  "16GB",
+	//		"memUsed":   "9.2GB",
+	//		"memUsage":  "57.5%",
+	//		"uptime":    "15天8小时32分钟",
+	//		"version":   "v1.0.0",
+	//		"interval":  30,
+	//	},
+	//}
+	//b2, err := f.Serialize(&message)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//client.Publish(topic2, 0, false, b2)
 }
