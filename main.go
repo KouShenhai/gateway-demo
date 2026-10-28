@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/apache/fory/go/fory"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"os"
 	"time"
 )
 
@@ -48,7 +50,8 @@ type UpReportPropertiesGatewayMessage struct {
 }
 
 func main() {
-	a := 1
+	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
 	f := fory.New(fory.WithXlang(true))
 	if err := f.RegisterStruct(GatewayMessage{}, 1); err != nil {
 		fmt.Println(err)
@@ -69,7 +72,7 @@ func main() {
 		fmt.Println(token.Error())
 	}
 	defer client.Disconnect(250)
-	if a == 1 {
+	if input == "1" {
 		// 设备属性
 		topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
 		msg := UpReportPropertiesDeviceMessage{
@@ -137,7 +140,7 @@ func main() {
 			fmt.Println(err)
 		}
 		client.Publish(topic1, 0, false, b1)
-	} else if a == 2 {
+	} else if input == "2" {
 		// 网关属性
 		topic2 := "up/laokouyun/KEG100/properties/report"
 		message := UpReportPropertiesGatewayMessage{
