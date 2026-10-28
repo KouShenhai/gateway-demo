@@ -50,29 +50,72 @@ func main() {
 	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 3); err != nil {
 		fmt.Println(err)
 	}
-	options := mqtt.NewClientOptions().AddBroker("tcp://127.0.0.1:41883").SetClientID("test-001").SetUsername("root").SetPassword("laokou123").SetConnectTimeout(5 * time.Second)
+	options := mqtt.NewClientOptions().AddBroker("tcp://0.0.0.0:41883").SetClientID("test-001").SetUsername("root").SetPassword("laokou123").SetConnectTimeout(5 * time.Second)
 	client := mqtt.NewClient(options)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 	}
 	defer client.Disconnect(250)
-	topic := "up/laokouyun/KEG100/DEV100/properties/report"
+	topic := "up/laokouyun/KEG100/CNC100/properties/report"
 	msg := &UpReportPropertiesDeviceMessage{
 		DeviceMessage: DeviceMessage{
 			GatewayMessage: GatewayMessage{
 				TenantCode: "laokouyun",
 				GatewaySn:  "KEG100",
 				Timestamp:  time.Now().UnixMilli(),
-				RequestId:  1001,
+				RequestId:  100,
 				Metadata:   map[string]interface{}{},
 			},
-			DeviceSn:   "DEV100",
-			DeviceName: "温度传感器",
+			DeviceSn:   "CNC100",
+			DeviceName: "数控机床",
 		},
 		Properties: map[string]interface{}{
-			"temperature": 25.6,
-			"humidity":    60,
+              "programNumber": "CNC100",
+              "programName": "SHAFT_ROUGHING_V2.NC",
+              "readTime": "2026-10-28 14:06:47",
+              "spindleRatio": 85,
+              "spindleLoad": 623,
+              "spindleName": "SPINDLE-100",
+              "spindleSpeed": 4380,
+              "spindleActualSpeed": 5010,
+              "workTime": 18640,
+              "bootTime": "2026-10-28 07:30:12",
+              "cuttingTime": 9420,
+              "feedRate": 78,
+              "feedRatio": 100,
+              "singleWorkPieces": 4,
+              "workPieces": 1357,
+              "workMode": "AUTO",
+              "runningState": "running",
+              "emergencyStopState": true,
+              "alarmState": true,
+              "programRegisteredNumber": 128,
+              "programRegistrableNumber": 372,
+              "memoryUsed": 524288,
+              "memoryAvailable": 786432,
+              "spindleSetSpeed": 4500,
+              "spindleTemperature": 46,
+              "machinePositionY": 1520,
+              "spindleCurrent": 1850,
+              "feedSetRate": 800,
+              "workpieceNumber": 1357,
+              "toolNumber": 7,
+              "blockNumber": 1204,
+              "servoLoadX": 32,
+              "servoLoadY": 28,
+              "servoLoadZ": 41,
+              "surplusPositionX": 15,
+              "surplusPositionY": 8,
+              "surplusPositionZ": 3,
+              "workpiecePositionX": 2350,
+              "workpiecePositionY": 1200,
+              "workpiecePositionZ": 450,
+              "machinePositionX": 2500,
+              "machinePositionZ": 480,
+              "currentPositionX": 2350,
+              "currentPositionY": 1200,
+              "currentPositionZ": 450,
 		},
 	}
 	bytes, err := f.Serialize(msg)
