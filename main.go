@@ -7,41 +7,38 @@ import (
 	"time"
 )
 
-// GatewayMessage 网关消息基类
-type GatewayMessage struct {
-	// 租户编码
-	TenantCode string `json:"tenantCode,omitempty"`
-	// 网关SN
-	GatewaySn string `json:"gatewaySn,omitempty"`
-	// 时间戳
-	Timestamp int64 `json:"timestamp,omitempty"`
-	// 请求ID
-	RequestId int64 `json:"requestId,omitempty"`
-	// 扩展元数据
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-// DeviceMessage 设备消息（嵌入 GatewayMessage）
-type DeviceMessage struct {
-	GatewayMessage
-
+// UpReportPropertiesDeviceMessage 上报属性设备消息
+type UpReportPropertiesDeviceMessage struct {
+		// 租户编码
+    	TenantCode string `json:"tenantCode,omitempty"`
+    	// 网关SN
+    	GatewaySn string `json:"gatewaySn,omitempty"`
+    	// 时间戳
+    	Timestamp int64 `json:"timestamp,omitempty"`
+    	// 请求ID
+    	RequestId int64 `json:"requestId,omitempty"`
+    	// 扩展元数据
+    	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// 设备SN
 	DeviceSn string `json:"deviceSn,omitempty"`
 	// 设备名称
 	DeviceName string `json:"deviceName,omitempty"`
-}
-
-// UpReportPropertiesDeviceMessage 上报属性设备消息
-type UpReportPropertiesDeviceMessage struct {
-	DeviceMessage
-
 	// 设备属性
 	Properties map[string]interface{} `json:"properties,omitempty"`
 }
 
 // UpReportPropertiesGatewayMessage 上报属性网关消息
 type UpReportPropertiesGatewayMessage struct {
-	GatewayMessage
+		// 租户编码
+    	TenantCode string `json:"tenantCode,omitempty"`
+    	// 网关SN
+    	GatewaySn string `json:"gatewaySn,omitempty"`
+    	// 时间戳
+    	Timestamp int64 `json:"timestamp,omitempty"`
+    	// 请求ID
+    	RequestId int64 `json:"requestId,omitempty"`
+    	// 扩展元数据
+    	Metadata map[string]interface{} `json:"metadata,omitempty"`
 
 	// 设备属性
 	Properties map[string]interface{} `json:"properties,omitempty"`
@@ -49,16 +46,10 @@ type UpReportPropertiesGatewayMessage struct {
 
 func main() {
 	f := fory.New(fory.WithXlang(true))
-	if err := f.RegisterStruct(GatewayMessage{}, 1); err != nil {
+	if err := f.RegisterStruct(UpReportPropertiesGatewayMessage{}, 244); err != nil {
 		fmt.Println(err)
 	}
-	if err := f.RegisterStruct(DeviceMessage{}, 2); err != nil {
-		fmt.Println(err)
-	}
-	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 3); err != nil {
-		fmt.Println(err)
-	}
-	if err := f.RegisterStruct(UpReportPropertiesGatewayMessage{}, 4); err != nil {
+	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 245); err != nil {
 		fmt.Println(err)
 	}
 	options := mqtt.NewClientOptions().AddBroker("tcp://0.0.0.0:41883").SetClientID("test-001").SetUsername("root").SetPassword("laokou123").SetConnectTimeout(5 * time.Second)
@@ -77,17 +68,13 @@ func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
 	// 设备属性
 	topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
 	msg := UpReportPropertiesDeviceMessage{
-		DeviceMessage: DeviceMessage{
-			GatewayMessage: GatewayMessage{
-				TenantCode: "laokouyun",
-				GatewaySn:  "KEG100",
-				Timestamp:  time.Now().UnixMilli(),
-				RequestId:  100,
-				Metadata:   map[string]interface{}{},
-			},
-			DeviceSn:   "CNC100",
-			DeviceName: "数控机床",
-		},
+    TenantCode: "laokouyun",
+    				GatewaySn:  "KEG100",
+    				Timestamp:  time.Now().UnixMilli(),
+    				RequestId:  100,
+    				Metadata:   map[string]interface{}{},
+    							DeviceSn:   "CNC100",
+                    			DeviceName: "数控机床",
 		Properties: map[string]interface{}{
 			"programNumber":            "CNC100",
 			"programName":              "SHAFT_ROUGHING_V2.NC",
@@ -147,13 +134,11 @@ func sendGatewayMessage(f *fory.Fory, client mqtt.Client) {
 	// 网关属性
 	topic2 := "up/laokouyun/KEG100/properties/report"
 	message := UpReportPropertiesGatewayMessage{
-		GatewayMessage: GatewayMessage{
 			TenantCode: "laokouyun",
 			GatewaySn:  "KEG100",
 			Timestamp:  time.Now().UnixMilli(),
 			RequestId:  101,
 			Metadata:   map[string]interface{}{},
-		},
 		Properties: map[string]interface{}{
 			"diskTotal": "128GB",
 			"diskUsed":  "76.8GB",
