@@ -66,10 +66,10 @@ func main() {
 
 func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
 	// 设备属性
-	topic1 := "up/laokouyun/KEG100/CNC100/properties/report"
+	topic1 := "up/laokouyun/KEG10000/CNC100/properties/report"
 	msg := UpReportPropertiesDeviceMessage{
     TenantCode: "laokouyun",
-    				GatewaySn:  "KEG100",
+    				GatewaySn:  "KEG10000",
     				Timestamp:  time.Now().UnixMilli(),
     				RequestId:  100,
     				Metadata:   map[string]interface{}{},
@@ -132,10 +132,10 @@ func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
 
 func sendGatewayMessage(f *fory.Fory, client mqtt.Client) {
 	// 网关属性
-	topic2 := "up/laokouyun/KEG100/properties/report"
+	topic2 := "up/laokouyun/KEG10000/properties/report"
 	message := UpReportPropertiesGatewayMessage{
 			TenantCode: "laokouyun",
-			GatewaySn:  "KEG100",
+			GatewaySn:  "KEG10000",
 			Timestamp:  time.Now().UnixMilli(),
 			RequestId:  101,
 			Metadata:   map[string]interface{}{},
