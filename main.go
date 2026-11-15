@@ -9,16 +9,16 @@ import (
 
 // UpReportPropertiesDeviceMessage 上报属性设备消息
 type UpReportPropertiesDeviceMessage struct {
-		// 租户编码
-    	TenantCode string `json:"tenantCode,omitempty"`
-    	// 网关SN
-    	GatewaySn string `json:"gatewaySn,omitempty"`
-    	// 时间戳
-    	Timestamp int64 `json:"timestamp,omitempty"`
-    	// 请求ID
-    	RequestId int64 `json:"requestId,omitempty"`
-    	// 扩展元数据
-    	Metadata map[string]interface{} `json:"metadata,omitempty"`
+    // 租户编码
+    TenantCode string `json:"tenantCode,omitempty"`
+    // 网关SN
+    GatewaySn string `json:"gatewaySn,omitempty"`
+    // 时间戳
+    Timestamp int64 `json:"timestamp,omitempty"`
+    // 请求ID
+    RequestId int64 `json:"requestId,omitempty"`
+    // 扩展元数据
+    Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// 设备SN
 	DeviceSn string `json:"deviceSn,omitempty"`
 	// 设备名称
@@ -29,19 +29,82 @@ type UpReportPropertiesDeviceMessage struct {
 
 // UpReportPropertiesGatewayMessage 上报属性网关消息
 type UpReportPropertiesGatewayMessage struct {
-		// 租户编码
-    	TenantCode string `json:"tenantCode,omitempty"`
-    	// 网关SN
-    	GatewaySn string `json:"gatewaySn,omitempty"`
-    	// 时间戳
-    	Timestamp int64 `json:"timestamp,omitempty"`
-    	// 请求ID
-    	RequestId int64 `json:"requestId,omitempty"`
-    	// 扩展元数据
-    	Metadata map[string]interface{} `json:"metadata,omitempty"`
+    // 租户编码
+    TenantCode string `json:"tenantCode,omitempty"`
+    // 网关SN
+    GatewaySn string `json:"gatewaySn,omitempty"`
+    // 时间戳
+    Timestamp int64 `json:"timestamp,omitempty"`
+    // 请求ID
+    RequestId int64 `json:"requestId,omitempty"`
+    // 扩展元数据
+    Metadata map[string]interface{} `json:"metadata,omitempty"`
 
 	// 设备属性
 	Properties map[string]interface{} `json:"properties,omitempty"`
+}
+
+// DownCommandGatewayMessage 下行指令网关消息
+type DownCommandGatewayMessage struct {
+	// TenantCode 租户编码
+	TenantCode string `json:"tenantCode,omitempty"`
+
+	// GatewaySn 网关SN
+	GatewaySn string `json:"gatewaySn,omitempty"`
+
+	// Timestamp 时间戳（Java Long，毫秒）
+	Timestamp int64 `json:"timestamp,omitempty"`
+
+	// RequestId 请求ID
+	RequestId int64 `json:"requestId,omitempty"`
+
+	// Metadata 扩展元数据
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+
+	// DeviceSn 设备SN
+	DeviceSn string `json:"deviceSn,omitempty"`
+
+	// DeviceName 设备名称
+	DeviceName string `json:"deviceName,omitempty"`
+
+	// Command 指令
+	Command string `json:"command,omitempty"`
+
+	// Param 参数值
+	Param map[string]interface{} `json:"param,omitempty"`
+}
+
+// UpCommandReplyGatewayMessage 上行指令回复网关消息
+type UpCommandReplyGatewayMessage struct {
+	// TenantCode 租户编码
+	TenantCode string `json:"tenantCode,omitempty"`
+
+	// GatewaySn 网关SN
+	GatewaySn string `json:"gatewaySn,omitempty"`
+
+	// Timestamp 时间戳（Java Long，毫秒）
+	Timestamp int64 `json:"timestamp,omitempty"`
+
+	// RequestId 请求ID
+	RequestId int64 `json:"requestId,omitempty"`
+
+	// Metadata 扩展元数据
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
+
+	// DeviceSn 设备SN
+	DeviceSn string `json:"deviceSn,omitempty"`
+
+	// DeviceName 设备名称
+	DeviceName string `json:"deviceName,omitempty"`
+
+	// Command 指令
+	Command string `json:"command,omitempty"`
+
+	// Payload 内容
+	Payload map[string]interface{} `json:"payload,omitempty"`
+
+	// Message 信息
+	Message string `json:"message,omitempty"`
 }
 
 func main() {
@@ -52,16 +115,50 @@ func main() {
 	if err := f.RegisterStruct(UpReportPropertiesDeviceMessage{}, 245); err != nil {
 		fmt.Println(err)
 	}
+	if err := f.RegisterStruct(DownCommandGatewayMessage{}, 246); err != nil {
+		fmt.Println(err)
+	}
+	if err := f.RegisterStruct(UpCommandReplyGatewayMessage{}, 247); err != nil {
+		fmt.Println(err)
+	}
 	options := mqtt.NewClientOptions().AddBroker("tcp://0.0.0.0:41883").SetClientID("test-001").SetUsername("root").SetPassword("laokou123").SetConnectTimeout(5 * time.Second)
 	client := mqtt.NewClient(options)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 	}
+    subToken := client.Subscribe("down/laokouyun/KEG10000/command", 1, func(c mqtt.Client, m mqtt.Message) {
+        var msg DownCommandGatewayMessage
+        if err := f.Unmarshal(m.Payload(), &msg); err != nil {
+            fmt.Println("反序列化失败:", err)
+            return
+        }
+        fmt.Printf("收到下行指令: sn=%s, command=%s, requestId=%d, param=%v\n", msg.DeviceSn, msg.Command, msg.RequestId, msg.Param)
+        	message := UpCommandReplyGatewayMessage{
+        			TenantCode: "laokouyun",
+        			GatewaySn:  "KEG10000",
+        			Timestamp:  time.Now().UnixMilli(),
+        			RequestId:  msg.RequestId,
+        			Metadata:   map[string]interface{}{},
+        			Command: msg.Command,
+        			Payload: map[string]interface{}{},
+        			Message: "OK",
+        	}
+        	b3, err := f.Serialize(&message)
+        	if err != nil {
+        		fmt.Println(err)
+        	}
+        	client.Publish("up/laokouyun/KEG10000/command/reply", 1, false, b3)
+    })
+    if subToken.Wait() && subToken.Error() != nil {
+        fmt.Println("订阅失败:", subToken.Error())
+        return
+    }
 	defer client.Disconnect(250)
 	sendDeviceMessage(f, client)
 	time.Sleep(1 * time.Second)
 	sendGatewayMessage(f, client)
+	time.Sleep(100 * time.Second)
 }
 
 func sendDeviceMessage(f *fory.Fory, client mqtt.Client) {
